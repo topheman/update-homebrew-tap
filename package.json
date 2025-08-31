@@ -1,0 +1,12 @@
+{
+  "name": "update-homebrew-tap",
+  "version": "0.1.0",
+  "description": "Github action that updates the formula of a homebrew-tap repo based on your template",
+  "license": "MIT",
+  "author": "Christophe Rosset",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
