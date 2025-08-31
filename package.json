@@ -1,15 +1,21 @@
 {
-  "name": "update-homebrew-tap",
-  "version": "0.1.0",
-  "description": "Github action that updates the formula of a homebrew-tap repo based on your template",
-  "license": "MIT",
-  "author": "Christophe Rosset",
-  "type": "module",
-  "main": "dist/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.2.2"
-  }
+	"name": "update-homebrew-tap",
+	"version": "0.1.0",
+	"description": "Github action that updates the formula of a homebrew-tap repo based on your template",
+	"license": "MIT",
+	"author": "Christophe Rosset",
+	"type": "module",
+	"main": "dist/index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.2.2",
+		"@types/node": "^24.3.0",
+		"typescript": "^5.9.2"
+	},
+	"engines": {
+		"node": ">=24",
+		"npm": ">=10"
+	}
 }
