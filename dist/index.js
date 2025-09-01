@@ -28712,6 +28712,14 @@ function safeParse(input) {
 async function getInputs() {
     const tarFiles = core.getInput("tar-files", { required: true });
     const metadata = core.getInput("metadata", { required: true });
+    // Prefer explicit token input, then fallback to GITHUB_TOKEN env
+    const token = core.getInput("token") ||
+        process.env.GITHUB_TOKEN ||
+        process.env.PT_TOKEN ||
+        "";
+    if (!token) {
+        throw new Error("No authentication token provided. Please set `token` input or ensure `GITHUB_TOKEN`/`PT_TOKEN` is available.");
+    }
     return {
         formulaTargetRepository: core.getInput("formula-target-repository", {
             required: true,
@@ -28721,6 +28729,7 @@ async function getInputs() {
         tarFiles: safeParse(tarFiles),
         metadata: safeParse(metadata),
         commitMessage: core.getInput("commit-message") || "chore: update Homebrew formula",
+        token,
     };
 }
 async function sha256FromUrl(url) {
@@ -28736,10 +28745,11 @@ async function renderFormula(templatePath, data) {
     const template = await promises_namespaceObject.readFile(templatePath, "utf-8");
     return ejs_default().render(template, data);
 }
-async function cloneAndCommit(repo, filePath, content, commitMessage) {
+async function cloneAndCommit(repo, filePath, content, commitMessage, token) {
     const tempDir = await promises_namespaceObject.mkdtemp(external_node_path_namespaceObject.join(external_node_os_namespaceObject.tmpdir(), "homebrew-tap-"));
+    const url = `https://x-access-token:${token}@github.com/${repo}.git`;
     core.info(`Cloning ${repo} into ${tempDir}`);
-    await exec.exec("git", ["clone", `https://github.com/${repo}.git`, tempDir]);
+    await exec.exec("git", ["clone", url, tempDir]);
     const fullPath = external_node_path_namespaceObject.join(tempDir, filePath);
     await promises_namespaceObject.mkdir(external_node_path_namespaceObject.dirname(fullPath), { recursive: true });
     await promises_namespaceObject.writeFile(fullPath, content, "utf-8");
@@ -28781,7 +28791,7 @@ async function run() {
         // Render formula
         const formulaContent = await renderFormula(inputs.formulaTemplate, data);
         // Commit to target tap repo
-        await cloneAndCommit(inputs.formulaTargetRepository, inputs.formulaTargetFile, formulaContent, inputs.commitMessage);
+        await cloneAndCommit(inputs.formulaTargetRepository, inputs.formulaTargetFile, formulaContent, inputs.commitMessage, inputs.token);
         core.info("✅ Homebrew tap updated successfully");
     }
     catch (error) {

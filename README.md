@@ -24,9 +24,17 @@ The YAML/JSON mapping of architectures to tarball URLs.
 
 The YAML/JSON metadata (e.g. version, custom variables).
 
-### `commit-message`
+### `commit-message` (optional)
 
 The commit message to use when updating the formula.
+
+Default: `"chore: update Homebrew formula"`
+
+### `token` (optional)
+
+The token to use for authentication. If not provided, the action will use the `GITHUB_TOKEN` or `PT_TOKEN` environment variable.
+
+Use it if you want to use a different token than the default ones (if your homebrew-tap repo is in a different organization than your source repo for example).
 
 ## Outputs
 

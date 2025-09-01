@@ -13,6 +13,7 @@ interface Inputs {
 	tarFiles: string;
 	metadata: string;
 	commitMessage: string;
+	token: string;
 }
 
 function safeParse(input: string): any {
@@ -28,6 +29,19 @@ async function getInputs(): Promise<Inputs> {
 	const tarFiles = core.getInput("tar-files", { required: true });
 	const metadata = core.getInput("metadata", { required: true });
 
+	// Prefer explicit token input, then fallback to GITHUB_TOKEN env
+	const token =
+		core.getInput("token") ||
+		process.env.GITHUB_TOKEN ||
+		process.env.PT_TOKEN ||
+		"";
+
+	if (!token) {
+		throw new Error(
+			"No authentication token provided. Please set `token` input or ensure `GITHUB_TOKEN`/`PT_TOKEN` is available.",
+		);
+	}
+
 	return {
 		formulaTargetRepository: core.getInput("formula-target-repository", {
 			required: true,
@@ -38,6 +52,7 @@ async function getInputs(): Promise<Inputs> {
 		metadata: safeParse(metadata),
 		commitMessage:
 			core.getInput("commit-message") || "chore: update Homebrew formula",
+		token,
 	};
 }
 
@@ -63,10 +78,13 @@ async function cloneAndCommit(
 	filePath: string,
 	content: string,
 	commitMessage: string,
+	token: string,
 ): Promise<void> {
 	const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "homebrew-tap-"));
+	const url = `https://x-access-token:${token}@github.com/${repo}.git`;
+
 	core.info(`Cloning ${repo} into ${tempDir}`);
-	await exec.exec("git", ["clone", `https://github.com/${repo}.git`, tempDir]);
+	await exec.exec("git", ["clone", url, tempDir]);
 
 	const fullPath = path.join(tempDir, filePath);
 	await fs.mkdir(path.dirname(fullPath), { recursive: true });
@@ -121,6 +139,7 @@ async function run(): Promise<void> {
 			inputs.formulaTargetFile,
 			formulaContent,
 			inputs.commitMessage,
+			inputs.token,
 		);
 
 		core.info("✅ Homebrew tap updated successfully");
