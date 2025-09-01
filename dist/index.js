@@ -37296,6 +37296,7 @@ async function cloneAndCommit(repo, filePath, content, commitMessage) {
 async function run() {
     try {
         const inputs = await getInputs();
+        core.info(`Inputs: ${JSON.stringify(inputs, null, 2)}`);
         // Compute sha256 for each tarball
         const tarFilesWithSha = {};
         for (const [arch, url] of Object.entries(inputs.tarFiles)) {

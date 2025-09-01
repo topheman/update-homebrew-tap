@@ -95,6 +95,7 @@ async function cloneAndCommit(
 async function run(): Promise<void> {
 	try {
 		const inputs = await getInputs();
+		core.info(`Inputs: ${JSON.stringify(inputs, null, 2)}`);
 
 		// Compute sha256 for each tarball
 		const tarFilesWithSha: Record<string, { url: string; sha256: string }> = {};
