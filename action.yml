@@ -1,0 +1,35 @@
+name: "Update Homebrew Tap"
+description: "Generate and update a Homebrew formula in a tap repository from release artifacts."
+author: "topheman"
+
+# Define the inputs users can pass in their workflow
+inputs:
+  formula-target-repository:
+    description: "Target repository for the Homebrew tap (e.g. topheman/homebrew-tap)"
+    required: true
+  formula-target-file:
+    description: "Path to the formula file inside the tap repository (e.g. Formula/snakepipe.rb)"
+    required: true
+  formula-template:
+    description: "Path to the EJS template inside the source repo (e.g. homebrew/formula.rb.ejs)"
+    required: true
+  tar-files:
+    description: "YAML/JSON mapping of architectures to tarball URLs"
+    required: true
+  metadata:
+    description: "YAML/JSON metadata (e.g. version, custom variables)"
+    required: true
+  commit-message:
+    description: "Commit message to use when updating the formula"
+    required: false
+    default: "chore: update Homebrew formula"
+
+# What environment this action runs in
+runs:
+  using: "node24"
+  main: "dist/index.js"
+
+# Marketplace branding
+branding:
+  icon: "package"
+  color: "blue"
