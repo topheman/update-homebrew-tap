@@ -5,15 +5,23 @@ import * as path from "node:path";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import ejs from "ejs";
-import yaml from "yaml";
 
 interface Inputs {
 	formulaTargetRepository: string;
 	formulaTargetFile: string;
 	formulaTemplate: string;
-	tarFiles: Record<string, string>;
-	metadata: Record<string, any>;
+	tarFiles: string;
+	metadata: string;
 	commitMessage: string;
+}
+
+function safeParse(input: string): any {
+	try {
+		return JSON.parse(input);
+	} catch {
+		core.setFailed(`Failed to parse input as JSON. Original input:\n${input}`);
+		return null;
+	}
 }
 
 async function getInputs(): Promise<Inputs> {
@@ -26,19 +34,11 @@ async function getInputs(): Promise<Inputs> {
 		}),
 		formulaTargetFile: core.getInput("formula-target-file", { required: true }),
 		formulaTemplate: core.getInput("formula-template", { required: true }),
-		tarFiles: parseYamlOrJson(tarFiles),
-		metadata: parseYamlOrJson(metadata),
+		tarFiles: safeParse(tarFiles),
+		metadata: safeParse(metadata),
 		commitMessage:
 			core.getInput("commit-message") || "chore: update Homebrew formula",
 	};
-}
-
-function parseYamlOrJson(input: string): any {
-	try {
-		return JSON.parse(input);
-	} catch {
-		return yaml.parse(input);
-	}
 }
 
 async function sha256FromUrl(url: string): Promise<string> {
@@ -108,7 +108,7 @@ async function run(): Promise<void> {
 
 		// Prepare data for template
 		const data = {
-			...inputs.metadata,
+			metadata: inputs.metadata,
 			tarFiles: tarFilesWithSha,
 		};
 
