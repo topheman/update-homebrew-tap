@@ -28712,14 +28712,6 @@ function safeParse(input) {
 async function getInputs() {
     const tarFiles = core.getInput("tar-files", { required: true });
     const metadata = core.getInput("metadata", { required: true });
-    // Prefer explicit token input, then fallback to GITHUB_TOKEN env
-    const token = core.getInput("token") ||
-        process.env.GITHUB_TOKEN ||
-        process.env.PT_TOKEN ||
-        "";
-    if (!token) {
-        throw new Error("No authentication token provided. Please set `token` input or ensure `GITHUB_TOKEN`/`PT_TOKEN` is available.");
-    }
     return {
         formulaTargetRepository: core.getInput("formula-target-repository", {
             required: true,
@@ -28729,7 +28721,7 @@ async function getInputs() {
         tarFiles: safeParse(tarFiles),
         metadata: safeParse(metadata),
         commitMessage: core.getInput("commit-message") || "chore: update Homebrew formula",
-        token,
+        githubToken: core.getInput("github-token", { required: true }),
     };
 }
 async function sha256FromUrl(url) {
@@ -28746,10 +28738,13 @@ async function renderFormula(templatePath, data) {
     return ejs_default().render(template, data);
 }
 async function cloneAndCommit(repo, filePath, content, commitMessage, token) {
+    const env = {
+        ...process.env,
+        GH_TOKEN: token,
+    };
     const tempDir = await promises_namespaceObject.mkdtemp(external_node_path_namespaceObject.join(external_node_os_namespaceObject.tmpdir(), "homebrew-tap-"));
-    const url = `https://x-access-token:${token}@github.com/${repo}.git`;
     core.info(`Cloning ${repo} into ${tempDir}`);
-    await exec.exec("git", ["clone", url, tempDir]);
+    await exec.exec("gh", ["repo", "clone", repo, tempDir], { env });
     const fullPath = external_node_path_namespaceObject.join(tempDir, filePath);
     await promises_namespaceObject.mkdir(external_node_path_namespaceObject.dirname(fullPath), { recursive: true });
     await promises_namespaceObject.writeFile(fullPath, content, "utf-8");
@@ -28769,12 +28764,18 @@ async function cloneAndCommit(repo, filePath, content, commitMessage, token) {
     ]);
     await exec.exec("git", ["-C", tempDir, "add", filePath]);
     await exec.exec("git", ["-C", tempDir, "commit", "-m", commitMessage]);
-    await exec.exec("git", ["-C", tempDir, "push"]);
+    // ✅ Push using authenticated URL directly
+    const pushUrl = `https://x-access-token:${token}@github.com/${repo}.git`;
+    await exec.exec("git", ["-C", tempDir, "push", pushUrl, "HEAD"], { env });
 }
 async function run() {
     try {
         const inputs = await getInputs();
         core.info(`Inputs: ${JSON.stringify(inputs, null, 2)}`);
+        if (!inputs.githubToken) {
+            core.setFailed("github-token is not set");
+            return;
+        }
         // Compute sha256 for each tarball
         const tarFilesWithSha = {};
         for (const [arch, url] of Object.entries(inputs.tarFiles)) {
@@ -28791,7 +28792,7 @@ async function run() {
         // Render formula
         const formulaContent = await renderFormula(inputs.formulaTemplate, data);
         // Commit to target tap repo
-        await cloneAndCommit(inputs.formulaTargetRepository, inputs.formulaTargetFile, formulaContent, inputs.commitMessage, inputs.token);
+        await cloneAndCommit(inputs.formulaTargetRepository, inputs.formulaTargetFile, formulaContent, inputs.commitMessage, inputs.githubToken);
         core.info("✅ Homebrew tap updated successfully");
     }
     catch (error) {

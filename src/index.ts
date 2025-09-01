@@ -13,7 +13,7 @@ interface Inputs {
 	tarFiles: string;
 	metadata: string;
 	commitMessage: string;
-	token: string;
+	githubToken: string;
 }
 
 function safeParse(input: string): any {
@@ -29,19 +29,6 @@ async function getInputs(): Promise<Inputs> {
 	const tarFiles = core.getInput("tar-files", { required: true });
 	const metadata = core.getInput("metadata", { required: true });
 
-	// Prefer explicit token input, then fallback to GITHUB_TOKEN env
-	const token =
-		core.getInput("token") ||
-		process.env.GITHUB_TOKEN ||
-		process.env.PT_TOKEN ||
-		"";
-
-	if (!token) {
-		throw new Error(
-			"No authentication token provided. Please set `token` input or ensure `GITHUB_TOKEN`/`PT_TOKEN` is available.",
-		);
-	}
-
 	return {
 		formulaTargetRepository: core.getInput("formula-target-repository", {
 			required: true,
@@ -52,7 +39,7 @@ async function getInputs(): Promise<Inputs> {
 		metadata: safeParse(metadata),
 		commitMessage:
 			core.getInput("commit-message") || "chore: update Homebrew formula",
-		token,
+		githubToken: core.getInput("github-token", { required: true }),
 	};
 }
 
@@ -80,11 +67,14 @@ async function cloneAndCommit(
 	commitMessage: string,
 	token: string,
 ): Promise<void> {
+	const env = {
+		...process.env,
+		GH_TOKEN: token,
+	};
 	const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "homebrew-tap-"));
-	const url = `https://x-access-token:${token}@github.com/${repo}.git`;
 
 	core.info(`Cloning ${repo} into ${tempDir}`);
-	await exec.exec("git", ["clone", url, tempDir]);
+	await exec.exec("gh", ["repo", "clone", repo, tempDir], { env });
 
 	const fullPath = path.join(tempDir, filePath);
 	await fs.mkdir(path.dirname(fullPath), { recursive: true });
@@ -107,13 +97,21 @@ async function cloneAndCommit(
 
 	await exec.exec("git", ["-C", tempDir, "add", filePath]);
 	await exec.exec("git", ["-C", tempDir, "commit", "-m", commitMessage]);
-	await exec.exec("git", ["-C", tempDir, "push"]);
+
+	// ✅ Push using authenticated URL directly
+	const pushUrl = `https://x-access-token:${token}@github.com/${repo}.git`;
+	await exec.exec("git", ["-C", tempDir, "push", pushUrl, "HEAD"], { env });
 }
 
 async function run(): Promise<void> {
 	try {
 		const inputs = await getInputs();
 		core.info(`Inputs: ${JSON.stringify(inputs, null, 2)}`);
+
+		if (!inputs.githubToken) {
+			core.setFailed("github-token is not set");
+			return;
+		}
 
 		// Compute sha256 for each tarball
 		const tarFilesWithSha: Record<string, { url: string; sha256: string }> = {};
@@ -139,7 +137,7 @@ async function run(): Promise<void> {
 			inputs.formulaTargetFile,
 			formulaContent,
 			inputs.commitMessage,
-			inputs.token,
+			inputs.githubToken,
 		);
 
 		core.info("✅ Homebrew tap updated successfully");

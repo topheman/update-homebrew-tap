@@ -23,6 +23,10 @@ inputs:
     description: "Commit message to use when updating the formula"
     required: false
     default: "chore: update Homebrew formula"
+  github-token:
+    description: "GitHub token for authentication (defaults to GITHUB_TOKEN)"
+    required: false
+    default: ${{ github.token }}
 
 # What environment this action runs in
 runs:
