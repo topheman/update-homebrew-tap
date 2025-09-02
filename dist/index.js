@@ -34624,9 +34624,9 @@ async function run() {
                 version: schemas_string(),
             });
             lib_core.info(`data.tarFiles - raw ${data.tarFiles}`);
-            lib_core.info(`data.tarFiles - stringified ${JSON.stringify(data.tarFiles)}`);
+            lib_core.info(`data.tarFiles - stringified ${JSON.stringify(data.tarFiles, null, 2)}`);
             lib_core.info(`data.metadata - raw ${data.metadata}`);
-            lib_core.info(`data.metadata - stringified ${JSON.stringify(data.metadata)}`);
+            lib_core.info(`data.metadata - stringified ${JSON.stringify(data.metadata, null, 2)}`);
             const tarFiles = tarFilesSchema.parse(JSON.stringify(data.tarFiles));
             const metadata = metadataSchema.parse(JSON.stringify(data.metadata));
             formulaContent = ejs_default().render(defaultTemplate, {
