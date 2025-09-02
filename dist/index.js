@@ -34486,8 +34486,8 @@ async function getInputs() {
         }),
         formulaTargetFile: lib_core.getInput("formula-target-file", { required: true }),
         formulaTemplate: lib_core.getInput("formula-template"),
-        tarFiles: src_safeParse(tarFiles),
-        metadata: src_safeParse(metadata),
+        tarFiles: src_safeParse(tarFiles || "{}"),
+        metadata: src_safeParse(metadata || "{}"),
         commitMessage: lib_core.getInput("commit-message"),
         githubToken: lib_core.getInput("github-token", { required: true }),
     };
@@ -34541,6 +34541,7 @@ async function run() {
         const inputs = await getInputs();
         lib_core.info(`Inputs: stringified ${JSON.stringify(inputs, null, 2)}`);
         lib_core.info(`Inputs: raw ${inputs}`);
+        lib_core.info(`Inputs: ${inputs}`);
         if (!inputs.githubToken) {
             lib_core.setFailed("github-token is not set");
             return;
@@ -34601,7 +34602,7 @@ async function run() {
         }
         // Commit to target tap repo
         await cloneAndCommit(inputs.formulaTargetRepository, inputs.formulaTargetFile, formulaContent, inputs.commitMessage ||
-            `chore: update Homebrew formula ${inputs.formulaTargetFile}${data.metadata.version ? ` ${data.metadata.version}` : ""}`, inputs.githubToken);
+            `chore: update Homebrew formula ${inputs.formulaTargetFile}}`, inputs.githubToken);
         lib_core.info("✅ Homebrew tap updated successfully");
     }
     catch (error) {

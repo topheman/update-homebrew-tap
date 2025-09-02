@@ -36,8 +36,8 @@ async function getInputs(): Promise<ParsedInputs> {
 		}),
 		formulaTargetFile: core.getInput("formula-target-file", { required: true }),
 		formulaTemplate: core.getInput("formula-template"),
-		tarFiles: safeParse(tarFiles),
-		metadata: safeParse(metadata),
+		tarFiles: safeParse(tarFiles || "{}"),
+		metadata: safeParse(metadata || "{}"),
 		commitMessage: core.getInput("commit-message"),
 		githubToken: core.getInput("github-token", { required: true }),
 	};
@@ -108,6 +108,7 @@ async function run(): Promise<void> {
 		const inputs = await getInputs();
 		core.info(`Inputs: stringified ${JSON.stringify(inputs, null, 2)}`);
 		core.info(`Inputs: raw ${inputs}`);
+		core.info(`Inputs: ${inputs}`);
 
 		if (!inputs.githubToken) {
 			core.setFailed("github-token is not set");
@@ -180,7 +181,7 @@ async function run(): Promise<void> {
 			inputs.formulaTargetFile,
 			formulaContent,
 			inputs.commitMessage ||
-				`chore: update Homebrew formula ${inputs.formulaTargetFile}${data.metadata.version ? ` ${data.metadata.version}` : ""}`,
+				`chore: update Homebrew formula ${inputs.formulaTargetFile}}`,
 			inputs.githubToken,
 		);
 
