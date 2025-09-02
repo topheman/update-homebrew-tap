@@ -4,6 +4,10 @@ export const defaultTemplate = `class <%= metadata.className %> < Formula
   version "<%= metadata.version %>"
   license "<%= metadata.license %>"
 
+  if OS.linux? && Hardware::CPU.arm?
+    url "<%= tarFiles.linuxArm.url %>"
+    sha256 "<%= tarFiles.linuxArm.sha256 %>"
+  end
   if OS.linux? && Hardware::CPU.intel?
     url "<%= tarFiles.linuxIntel.url %>"
     sha256 "<%= tarFiles.linuxIntel.sha256 %>"

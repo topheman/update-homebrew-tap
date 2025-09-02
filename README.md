@@ -75,6 +75,7 @@ jobs:
           formula-target-file: Formula/greet.rb
           tar-files: |
             {
+              "linuxArm": "https://github.com/topheman/update-homebrew-tap-playground/releases/download/${{ github.ref_name }}/greet-aarch64-unknown-linux-gnu.tar.gz",
               "linuxIntel": "https://github.com/topheman/update-homebrew-tap-playground/releases/download/${{ github.ref_name }}/greet-x86_64-unknown-linux-gnu.tar.gz",
               "macArm": "https://github.com/topheman/update-homebrew-tap-playground/releases/download/${{ github.ref_name }}/greet-aarch64-apple-darwin.tar.gz",
               "macIntel": "https://github.com/topheman/update-homebrew-tap-playground/releases/download/${{ github.ref_name }}/greet-x86_64-apple-darwin.tar.gz"

@@ -141,6 +141,10 @@ async function run(): Promise<void> {
 		if (!inputs.formulaTemplate) {
 			core.info("No formula-template passed, using default formula template");
 			const tarFilesSchema = z.object({
+				linuxArm: z.object({
+					url: z.string(),
+					sha256: z.string(),
+				}),
 				linuxIntel: z.object({
 					url: z.string(),
 					sha256: z.string(),

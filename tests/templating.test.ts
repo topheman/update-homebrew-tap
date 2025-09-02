@@ -26,6 +26,10 @@ describe("templating", () => {
 			defaultTemplate,
 			makeData({
 				tarFiles: {
+					linuxArm: {
+						url: "https://example.com/linux-arm.tar.gz",
+						sha256: "linuxArm1234567890",
+					},
 					linuxIntel: {
 						url: "https://example.com/linux-intel.tar.gz",
 						sha256: "linuxIntel1234567890",
@@ -49,6 +53,10 @@ describe("templating", () => {
   version "1.0.0"
   license "MIT"
 
+  if OS.linux? && Hardware::CPU.arm?
+    url "https://example.com/linux-arm.tar.gz"
+    sha256 "linuxArm1234567890"
+  end
   if OS.linux? && Hardware::CPU.intel?
     url "https://example.com/linux-intel.tar.gz"
     sha256 "linuxIntel1234567890"

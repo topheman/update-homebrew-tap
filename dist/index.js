@@ -34468,6 +34468,10 @@ const defaultTemplate = `class <%= metadata.className %> < Formula
   version "<%= metadata.version %>"
   license "<%= metadata.license %>"
 
+  if OS.linux? && Hardware::CPU.arm?
+    url "<%= tarFiles.linuxArm.url %>"
+    sha256 "<%= tarFiles.linuxArm.sha256 %>"
+  end
   if OS.linux? && Hardware::CPU.intel?
     url "<%= tarFiles.linuxIntel.url %>"
     sha256 "<%= tarFiles.linuxIntel.sha256 %>"
@@ -34603,6 +34607,10 @@ async function run() {
         if (!inputs.formulaTemplate) {
             lib_core.info("No formula-template passed, using default formula template");
             const tarFilesSchema = object({
+                linuxArm: object({
+                    url: schemas_string(),
+                    sha256: schemas_string(),
+                }),
                 linuxIntel: object({
                     url: schemas_string(),
                     sha256: schemas_string(),
