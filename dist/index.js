@@ -34627,8 +34627,8 @@ async function run() {
             lib_core.info(`data.tarFiles - stringified ${JSON.stringify(data.tarFiles, null, 2)}`);
             lib_core.info(`data.metadata - raw ${data.metadata}`);
             lib_core.info(`data.metadata - stringified ${JSON.stringify(data.metadata, null, 2)}`);
-            const tarFiles = tarFilesSchema.parse(JSON.stringify(data.tarFiles));
-            const metadata = metadataSchema.parse(JSON.stringify(data.metadata));
+            const tarFiles = tarFilesSchema.parse(data.tarFiles);
+            const metadata = metadataSchema.parse(data.metadata);
             formulaContent = ejs_default().render(defaultTemplate, {
                 tarFiles,
                 metadata: {

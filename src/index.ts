@@ -169,8 +169,8 @@ async function run(): Promise<void> {
 			core.info(
 				`data.metadata - stringified ${JSON.stringify(data.metadata, null, 2)}`,
 			);
-			const tarFiles = tarFilesSchema.parse(JSON.stringify(data.tarFiles));
-			const metadata = metadataSchema.parse(JSON.stringify(data.metadata));
+			const tarFiles = tarFilesSchema.parse(data.tarFiles);
+			const metadata = metadataSchema.parse(data.metadata);
 			formulaContent = ejs.render(defaultTemplate, {
 				tarFiles,
 				metadata: {
