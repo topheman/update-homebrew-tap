@@ -28685,6 +28685,8 @@ const promises_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.ur
 const external_node_os_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:os");
 ;// CONCATENATED MODULE: external "node:path"
 const external_node_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
+;// CONCATENATED MODULE: external "node:url"
+const external_node_url_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:url");
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var lib_core = __nccwpck_require__(7484);
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
@@ -34468,6 +34470,10 @@ function preprocess(fn, schema) {
 
 
 
+
+// Get __dirname equivalent for ES modules
+const src_filename = (0,external_node_url_namespaceObject.fileURLToPath)(import.meta.url);
+const src_dirname = external_node_path_namespaceObject.dirname(src_filename);
 function src_safeParse(input) {
     try {
         return JSON.parse(input);
@@ -34563,7 +34569,7 @@ async function run() {
         let formulaContent = "";
         if (!inputs.formulaTemplate) {
             lib_core.info("No formula-template passed, using default formula template");
-            const template = await promises_namespaceObject.readFile(external_node_path_namespaceObject.join(__dirname, "formula.rb.ejs"), "utf8");
+            const template = await promises_namespaceObject.readFile(external_node_path_namespaceObject.join(src_dirname, "formula.rb.ejs"), "utf8");
             const tarFilesSchema = object({
                 linuxIntel: object({
                     url: schemas_string(),

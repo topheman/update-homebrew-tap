@@ -2,10 +2,15 @@ import * as crypto from "node:crypto";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import ejs from "ejs";
 import * as z from "zod";
+
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 interface ParsedInputs {
 	formulaTargetRepository: string;
