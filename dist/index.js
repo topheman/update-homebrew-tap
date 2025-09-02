@@ -34623,6 +34623,10 @@ async function run() {
                 license: schemas_string(),
                 version: schemas_string(),
             });
+            lib_core.info(`data.tarFiles - raw ${data.tarFiles}`);
+            lib_core.info(`data.tarFiles - stringified ${JSON.stringify(data.tarFiles)}`);
+            lib_core.info(`data.metadata - raw ${data.metadata}`);
+            lib_core.info(`data.metadata - stringified ${JSON.stringify(data.metadata)}`);
             const tarFiles = tarFilesSchema.parse(JSON.stringify(data.tarFiles));
             const metadata = metadataSchema.parse(JSON.stringify(data.metadata));
             formulaContent = ejs_default().render(defaultTemplate, {
