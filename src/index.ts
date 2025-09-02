@@ -5,6 +5,7 @@ import * as path from "node:path";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import ejs from "ejs";
+import * as z from "zod";
 
 interface Inputs {
 	formulaTargetRepository: string;
@@ -129,7 +130,49 @@ async function run(): Promise<void> {
 		};
 
 		// Render formula
-		const formulaContent = await renderFormula(inputs.formulaTemplate, data);
+		let formulaContent = "";
+		if (!inputs.formulaTemplate) {
+			core.info("No formula-template passed, using default formula template");
+			const template = await fs.readFile(
+				path.join(__dirname, "formula.rb.ejs"),
+				"utf8",
+			);
+			const tarFilesSchema = z.object({
+				"linux-intel": z.object({
+					url: z.string(),
+					sha256: z.string(),
+				}),
+				"mac-arm": z.object({
+					url: z.string(),
+					sha256: z.string(),
+				}),
+				"mac-intel": z.object({
+					url: z.string(),
+					sha256: z.string(),
+				}),
+			});
+			const metadataSchema = z.object({
+				binaryName: z.string(),
+				description: z.string(),
+				homepage: z.string(),
+				license: z.string(),
+				version: z.string(),
+			});
+			const tarFiles = tarFilesSchema.parse(inputs.tarFiles);
+			const metadata = metadataSchema.parse(inputs.metadata);
+			formulaContent = ejs.render(template, {
+				tarFiles,
+				metadata: {
+					className:
+						metadata.binaryName.charAt(0).toUpperCase() +
+						metadata.binaryName.slice(1),
+					...metadata,
+				},
+			});
+		} else {
+			core.info(`Using formula-template passed: ${inputs.formulaTemplate}`);
+			formulaContent = await renderFormula(inputs.formulaTemplate, data);
+		}
 
 		// Commit to target tap repo
 		await cloneAndCommit(

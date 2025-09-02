@@ -12,9 +12,11 @@ The repository to update the formula in. example: `topheman/homebrew-tap`
 
 The path to the formula file inside the tap repository. example: `Formula/snakepipe.rb`
 
-### `formula-template`
+### `formula-template` (optional)
 
-The path to the EJS template inside your **source repo**. example: `homebrew/formula.rb.ejs`
+The path to the EJS template inside your **source repo**. example: `homebrew/formula.rb.ejs`.
+
+If you don't provide this, the action will use the [default template](./src/formula.rb.ejs).
 
 ### `tar-files`
 
@@ -62,47 +64,22 @@ jobs:
         uses: topheman/update-homebrew-tap@v1
         with:
           formula-target-repository: topheman/homebrew-tap
-          formula-target-file: Formula/snakepipe.rb
-          formula-template: source-repo/homebrew/formula.rb.ejs
+          formula-target-file: Formula/greet.rb
           tar-files: |
-            linux-intel=https://github.com/topheman/snake-pipe-rust/releases/download/${{ github.ref_name }}/snakepipe-x86_64-unknown-linux-gnu.tar.gz
-            mac-arm=https://github.com/topheman/snake-pipe-rust/releases/download/${{ github.ref_name }}/snakepipe-aarch64-apple-darwin.tar.gz
-            mac-intel=https://github.com/topheman/snake-pipe-rust/releases/download/${{ github.ref_name }}/snakepipe-x86_64-apple-darwin.tar.gz
+            {
+              "linuxIntel": "https://github.com/topheman/update-homebrew-tap-playground/releases/download/${{ github.ref_name }}/greet-x86_64-unknown-linux-gnu.tar.gz",
+              "macArm": "https://github.com/topheman/update-homebrew-tap-playground/releases/download/${{ github.ref_name }}/greet-aarch64-apple-darwin.tar.gz",
+              "macIntel": "https://github.com/topheman/update-homebrew-tap-playground/releases/download/${{ github.ref_name }}/greet-x86_64-apple-darwin.tar.gz"
+            }
           metadata: |
-            version=${{ github.ref_name }}
+            {
+              "version": "${{ github.ref_name }}",
+              "binaryName": "greet",
+              "description": "Greet CLI application",
+              "homepage": "https://github.com/topheman/update-homebrew-tap-playground",
+              "license": "MIT"
+            }
 ```
 
-Based on a formula template like this:
 
-```ejs
-class Snakepipe < Formula
-  desc "Snake game based on stdin/stdout in rust"
-  homepage "https://github.com/topheman/snake-pipe-rust"
-  version "<%= metadata.version %>"
-  license "MIT"
-
-  if OS.linux? && Hardware::CPU.intel?
-    url "<%= urls["linux-intel"].url %>"
-    sha256 "<%= urls["linux-intel"].sha256 %>"
-  end
-  if OS.mac? && Hardware::CPU.arm?
-    url "<%= urls["mac-arm"].url %>"
-    sha256 "<%= urls["mac-arm"].sha256 %>"
-  end
-  if OS.mac? && Hardware::CPU.intel?
-    url "<%= urls["mac-intel"].url %>"
-    sha256 "<%= urls["mac-intel"].sha256 %>"
-  end
-
-  def install
-    bin.install "snakepipe"
-    bash_completion.install "completions/bash/snakepipe"
-    fish_completion.install "completions/fish/snakepipe.fish"
-    zsh_completion.install "completions/zsh/_snakepipe"
-  end
-
-  test do
-    system "#{bin}/snakepipe", "--version"
-  end
-end
-```
+You can customize the template to your needs, keep it in your source repo and pass it as `formula-template` input.
