@@ -34644,7 +34644,7 @@ async function run() {
         }
         // Commit to target tap repo
         await cloneAndCommit(inputs.formulaTargetRepository, inputs.formulaTargetFile, formulaContent, inputs.commitMessage ||
-            `chore: update Homebrew formula ${inputs.formulaTargetFile}}`, inputs.githubToken);
+            `chore: update Homebrew formula ${inputs.formulaTargetFile}${data.metadata.version ? ` ${data.metadata.version}` : ""}`, inputs.githubToken);
         lib_core.info("✅ Homebrew tap updated successfully");
     }
     catch (error) {

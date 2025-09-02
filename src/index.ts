@@ -191,7 +191,7 @@ async function run(): Promise<void> {
 			inputs.formulaTargetFile,
 			formulaContent,
 			inputs.commitMessage ||
-				`chore: update Homebrew formula ${inputs.formulaTargetFile}}`,
+				`chore: update Homebrew formula ${inputs.formulaTargetFile}${data.metadata.version ? ` ${data.metadata.version}` : ""}`,
 			inputs.githubToken,
 		);
 
