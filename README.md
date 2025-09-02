@@ -16,7 +16,7 @@ The path to the formula file inside the tap repository. example: `Formula/snakep
 
 The path to the EJS template inside your **source repo**. example: `homebrew/formula.rb.ejs`.
 
-If you don't provide this, the action will use the [default template](./src/formula.rb.ejs).
+If you don't provide this, the action will use the [default template](./src/formulaTemplate.ts).
 
 ### `tar-files`
 
@@ -34,7 +34,17 @@ Default: `"chore: update Homebrew formula"`
 
 ### `github-token` (optional)
 
-Create a [personal access token](https://github.com/settings) with `contents: write` scope and pass it as environment variable (like in this example).
+Needed if you want to push to a different repository than the one you're in.
+
+1. Create a personal access token
+- Go to GitHub → Settings → Developer settings → [Personal access tokens](https://github.com/settings/personal-access-tokens)
+- Generate a new token with `contents: write` scope
+2. Add the secret to your repository:
+- Go to your repository → Settings → Secrets and variables → Actions
+- Click "New repository secret"
+- Name it `HOMEBREW_TAP_TOKEN` or whatever you want
+- Paste the token as the value
+
 
 ## Outputs
 
