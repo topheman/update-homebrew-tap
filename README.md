@@ -34,9 +34,7 @@ Default: `"chore: update Homebrew formula"`
 
 ### `github-token` (optional)
 
-The token to use for authentication. If not provided, the action will use the `GITHUB_TOKEN` environment variable.
-
-Use it if you want to use a different token than the default one (if your homebrew-tap repo is in a different organization than your source repo for example).
+Create a [personal access token](https://github.com/settings) with `contents: write` scope and pass it as environment variable (like in this example).
 
 ## Outputs
 
@@ -79,6 +77,7 @@ jobs:
               "homepage": "https://github.com/topheman/update-homebrew-tap-playground",
               "license": "MIT"
             }
+          github-token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
 ```
 
 

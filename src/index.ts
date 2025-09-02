@@ -7,12 +7,12 @@ import * as exec from "@actions/exec";
 import ejs from "ejs";
 import * as z from "zod";
 
-interface Inputs {
+interface ParsedInputs {
 	formulaTargetRepository: string;
 	formulaTargetFile: string;
 	formulaTemplate: string;
-	tarFiles: string;
-	metadata: string;
+	tarFiles: Record<string, any>;
+	metadata: Record<string, any>;
 	commitMessage: string;
 	githubToken: string;
 }
@@ -26,7 +26,7 @@ function safeParse(input: string): any {
 	}
 }
 
-async function getInputs(): Promise<Inputs> {
+async function getInputs(): Promise<ParsedInputs> {
 	const tarFiles = core.getInput("tar-files", { required: true });
 	const metadata = core.getInput("metadata", { required: true });
 
@@ -35,11 +35,10 @@ async function getInputs(): Promise<Inputs> {
 			required: true,
 		}),
 		formulaTargetFile: core.getInput("formula-target-file", { required: true }),
-		formulaTemplate: core.getInput("formula-template", { required: true }),
+		formulaTemplate: core.getInput("formula-template"),
 		tarFiles: safeParse(tarFiles),
 		metadata: safeParse(metadata),
-		commitMessage:
-			core.getInput("commit-message") || "chore: update Homebrew formula",
+		commitMessage: core.getInput("commit-message"),
 		githubToken: core.getInput("github-token", { required: true }),
 	};
 }
@@ -138,15 +137,15 @@ async function run(): Promise<void> {
 				"utf8",
 			);
 			const tarFilesSchema = z.object({
-				"linux-intel": z.object({
+				linuxIntel: z.object({
 					url: z.string(),
 					sha256: z.string(),
 				}),
-				"mac-arm": z.object({
+				macArm: z.object({
 					url: z.string(),
 					sha256: z.string(),
 				}),
-				"mac-intel": z.object({
+				macIntel: z.object({
 					url: z.string(),
 					sha256: z.string(),
 				}),
@@ -158,8 +157,8 @@ async function run(): Promise<void> {
 				license: z.string(),
 				version: z.string(),
 			});
-			const tarFiles = tarFilesSchema.parse(inputs.tarFiles);
-			const metadata = metadataSchema.parse(inputs.metadata);
+			const tarFiles = tarFilesSchema.parse(data.tarFiles);
+			const metadata = metadataSchema.parse(data.metadata);
 			formulaContent = ejs.render(template, {
 				tarFiles,
 				metadata: {
@@ -179,7 +178,8 @@ async function run(): Promise<void> {
 			inputs.formulaTargetRepository,
 			inputs.formulaTargetFile,
 			formulaContent,
-			inputs.commitMessage,
+			inputs.commitMessage ||
+				`chore: update Homebrew formula ${inputs.formulaTargetFile}${data.metadata.version ? ` ${data.metadata.version}` : ""}`,
 			inputs.githubToken,
 		);
 

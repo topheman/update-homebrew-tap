@@ -34485,10 +34485,10 @@ async function getInputs() {
             required: true,
         }),
         formulaTargetFile: lib_core.getInput("formula-target-file", { required: true }),
-        formulaTemplate: lib_core.getInput("formula-template", { required: true }),
+        formulaTemplate: lib_core.getInput("formula-template"),
         tarFiles: src_safeParse(tarFiles),
         metadata: src_safeParse(metadata),
-        commitMessage: lib_core.getInput("commit-message") || "chore: update Homebrew formula",
+        commitMessage: lib_core.getInput("commit-message"),
         githubToken: lib_core.getInput("github-token", { required: true }),
     };
 }
@@ -34563,15 +34563,15 @@ async function run() {
             lib_core.info("No formula-template passed, using default formula template");
             const template = await promises_namespaceObject.readFile(external_node_path_namespaceObject.join(__dirname, "formula.rb.ejs"), "utf8");
             const tarFilesSchema = object({
-                "linux-intel": object({
+                linuxIntel: object({
                     url: schemas_string(),
                     sha256: schemas_string(),
                 }),
-                "mac-arm": object({
+                macArm: object({
                     url: schemas_string(),
                     sha256: schemas_string(),
                 }),
-                "mac-intel": object({
+                macIntel: object({
                     url: schemas_string(),
                     sha256: schemas_string(),
                 }),
@@ -34583,8 +34583,8 @@ async function run() {
                 license: schemas_string(),
                 version: schemas_string(),
             });
-            const tarFiles = tarFilesSchema.parse(inputs.tarFiles);
-            const metadata = metadataSchema.parse(inputs.metadata);
+            const tarFiles = tarFilesSchema.parse(data.tarFiles);
+            const metadata = metadataSchema.parse(data.metadata);
             formulaContent = ejs_default().render(template, {
                 tarFiles,
                 metadata: {
@@ -34599,7 +34599,8 @@ async function run() {
             formulaContent = await renderFormula(inputs.formulaTemplate, data);
         }
         // Commit to target tap repo
-        await cloneAndCommit(inputs.formulaTargetRepository, inputs.formulaTargetFile, formulaContent, inputs.commitMessage, inputs.githubToken);
+        await cloneAndCommit(inputs.formulaTargetRepository, inputs.formulaTargetFile, formulaContent, inputs.commitMessage ||
+            `chore: update Homebrew formula ${inputs.formulaTargetFile}${data.metadata.version ? ` ${data.metadata.version}` : ""}`, inputs.githubToken);
         lib_core.info("✅ Homebrew tap updated successfully");
     }
     catch (error) {
