@@ -157,8 +157,8 @@ async function run(): Promise<void> {
 				license: z.string(),
 				version: z.string(),
 			});
-			const tarFiles = tarFilesSchema.parse(data.tarFiles);
-			const metadata = metadataSchema.parse(data.metadata);
+			const tarFiles = tarFilesSchema.parse(JSON.stringify(data.tarFiles));
+			const metadata = metadataSchema.parse(JSON.stringify(data.metadata));
 			formulaContent = ejs.render(template, {
 				tarFiles,
 				metadata: {
