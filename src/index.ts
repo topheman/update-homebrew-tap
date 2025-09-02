@@ -106,7 +106,8 @@ async function cloneAndCommit(
 async function run(): Promise<void> {
 	try {
 		const inputs = await getInputs();
-		core.info(`Inputs: ${JSON.stringify(inputs, null, 2)}`);
+		core.info(`Inputs: stringified ${JSON.stringify(inputs, null, 2)}`);
+		core.info(`Inputs: raw ${inputs}`);
 
 		if (!inputs.githubToken) {
 			core.setFailed("github-token is not set");

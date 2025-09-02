@@ -34539,7 +34539,8 @@ async function cloneAndCommit(repo, filePath, content, commitMessage, token) {
 async function run() {
     try {
         const inputs = await getInputs();
-        lib_core.info(`Inputs: ${JSON.stringify(inputs, null, 2)}`);
+        lib_core.info(`Inputs: stringified ${JSON.stringify(inputs, null, 2)}`);
+        lib_core.info(`Inputs: raw ${inputs}`);
         if (!inputs.githubToken) {
             lib_core.setFailed("github-token is not set");
             return;

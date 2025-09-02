@@ -22,7 +22,7 @@ inputs:
   commit-message:
     description: "Commit message to use when updating the formula"
     required: false
-    default: "chore: update Homebrew formula"
+    default: ""
   github-token:
     description: "GitHub token for authentication (defaults to GITHUB_TOKEN)"
     required: false
