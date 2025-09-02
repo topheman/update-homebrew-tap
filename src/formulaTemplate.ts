@@ -1,4 +1,4 @@
-class <%= metadata.className %> < Formula
+export const defaultTemplate = `class <%= metadata.className %> < Formula
   desc "<%= metadata.description %>"
   homepage "<%= metadata.homepage %>"
   version "<%= metadata.version %>"
@@ -27,4 +27,4 @@ class <%= metadata.className %> < Formula
   test do
     system "#{bin}/<%= metadata.binaryName %>", "--version"
   end
-end
+end`;

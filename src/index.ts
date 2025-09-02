@@ -7,6 +7,7 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import ejs from "ejs";
 import * as z from "zod";
+import { defaultTemplate } from "./formulaTemplate.js";
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -139,10 +140,6 @@ async function run(): Promise<void> {
 		let formulaContent = "";
 		if (!inputs.formulaTemplate) {
 			core.info("No formula-template passed, using default formula template");
-			const template = await fs.readFile(
-				path.join(__dirname, "formula.rb.ejs"),
-				"utf8",
-			);
 			const tarFilesSchema = z.object({
 				linuxIntel: z.object({
 					url: z.string(),
@@ -166,7 +163,7 @@ async function run(): Promise<void> {
 			});
 			const tarFiles = tarFilesSchema.parse(JSON.stringify(data.tarFiles));
 			const metadata = metadataSchema.parse(JSON.stringify(data.metadata));
-			formulaContent = ejs.render(template, {
+			formulaContent = ejs.render(defaultTemplate, {
 				tarFiles,
 				metadata: {
 					className:

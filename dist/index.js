@@ -34461,7 +34461,40 @@ function preprocess(fn, schema) {
     return pipe(transform(fn), schema);
 }
 
+;// CONCATENATED MODULE: ./src/formulaTemplate.ts
+const defaultTemplate = `class <%= metadata.className %> < Formula
+  desc "<%= metadata.description %>"
+  homepage "<%= metadata.homepage %>"
+  version "<%= metadata.version %>"
+  license "<%= metadata.license %>"
+
+  if OS.linux? && Hardware::CPU.intel?
+    url "<%= tarFiles.linuxIntel.url %>"
+    sha256 "<%= tarFiles.linuxIntel.sha256 %>"
+  end
+  if OS.mac? && Hardware::CPU.arm?
+    url "<%= tarFiles.macArm.url %>"
+    sha256 "<%= tarFiles.macArm.sha256 %>"
+  end
+  if OS.mac? && Hardware::CPU.intel?
+    url "<%= tarFiles.macIntel.url %>"
+    sha256 "<%= tarFiles.macIntel.sha256 %>"
+  end
+
+  def install
+    bin.install "<%= metadata.binaryName %>"
+    bash_completion.install "completions/bash/<%= metadata.binaryName %>"
+    fish_completion.install "completions/fish/<%= metadata.binaryName %>.fish"
+    zsh_completion.install "completions/zsh/_<%= metadata.binaryName %>"
+  end
+
+  test do
+    system "#{bin}/<%= metadata.binaryName %>", "--version"
+  end
+end`;
+
 ;// CONCATENATED MODULE: ./src/index.ts
+
 
 
 
@@ -34569,7 +34602,6 @@ async function run() {
         let formulaContent = "";
         if (!inputs.formulaTemplate) {
             lib_core.info("No formula-template passed, using default formula template");
-            const template = await promises_namespaceObject.readFile(external_node_path_namespaceObject.join(src_dirname, "formula.rb.ejs"), "utf8");
             const tarFilesSchema = object({
                 linuxIntel: object({
                     url: schemas_string(),
@@ -34593,7 +34625,7 @@ async function run() {
             });
             const tarFiles = tarFilesSchema.parse(JSON.stringify(data.tarFiles));
             const metadata = metadataSchema.parse(JSON.stringify(data.metadata));
-            formulaContent = ejs_default().render(template, {
+            formulaContent = ejs_default().render(defaultTemplate, {
                 tarFiles,
                 metadata: {
                     className: metadata.binaryName.charAt(0).toUpperCase() +
