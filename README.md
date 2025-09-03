@@ -67,7 +67,7 @@ jobs:
       contents: write  # ✅ minimal required for pushing commits
 
     steps:
-      # ...
+      - uses: actions/checkout@v4
       - name: Update Homebrew Formula
         uses: topheman/update-homebrew-tap@v1
         with:
