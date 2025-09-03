@@ -93,3 +93,12 @@ jobs:
 
 
 You can customize the template to your needs, keep it in your source repo and pass it as `formula-template` input.
+
+## Related Actions
+
+- [topheman/create-release-if-not-exist](https://github.com/topheman/create-release-if-not-exist)
+
+## Used By
+
+- [topheman/webassembly-component-model-experiments](https://github.com/topheman/webassembly-component-model-experiments)
+- [topheman/update-homebrew-tap-playground](https://github.com/topheman/update-homebrew-tap-playground)
