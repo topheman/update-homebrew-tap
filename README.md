@@ -69,7 +69,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Update Homebrew Formula
-        uses: topheman/update-homebrew-tap@v1
+        uses: topheman/update-homebrew-tap@v2
         with:
           formula-target-repository: topheman/homebrew-tap
           formula-target-file: Formula/greet.rb
